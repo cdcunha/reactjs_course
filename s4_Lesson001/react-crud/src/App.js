@@ -1,6 +1,8 @@
+import axios from 'axios';
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import ListItem from './ListItem';
 
 class App extends Component {
   constructor(){
@@ -9,22 +11,26 @@ class App extends Component {
       newTodo: '',
       editing: false,
       editingIndex: null,
-      todos: [{
-        id: 1, name: 'Play golf'
-      },{
-        id: 2, name: 'Buy some clothes'
-      },{
-        id: 3, name: 'Write some code'
-      },{
-        id: 4, name: 'Watch Bahdcasts'
-      }]
+      notification: null,
+      todos: []
     }
 
+    this.apiUrl = 'https://5be35c93d53daf0013250f4f.mockapi.io';
+
+    this.alert = this.alert.bind(this);
     this.addTodo = this.addTodo.bind(this);
     this.editTodo = this.editTodo.bind(this);
     this.updateTodo = this.updateTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
+    this.generateTodoId = this.generateTodoId.bind(this);
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  async componentDidMount(){
+    const response = await axios.get(`${this.apiUrl}/todos`);
+    this.setState({
+      todos: response.data
+    })
   }
 
   handleChange(event){
@@ -34,10 +40,18 @@ class App extends Component {
     //console.log(event.target.name, event.target.value);
   }
 
+  generateTodoId(){
+    const lastTodo = this.state.todos[this.state.todos.length -1];
+    if (lastTodo){
+      return lastTodo.id + 1;
+    }
+    return 1;
+  }
+
   addTodo(){
     const newTodo = {
       name: this.state.newTodo,
-      id: this.state.todos[this.state.todos.length -1].id + 1
+      id: this.generateTodoId()
     }
 
     const todos = this.state.todos;
@@ -47,7 +61,9 @@ class App extends Component {
     this.setState({
       todos: todos,
       newTodo: ''
-    })
+    });
+
+    this.alert('Todo added successfully.')
   }
 
   editTodo(index){
@@ -71,12 +87,24 @@ class App extends Component {
       editingIndex: null,
       newTodo: ''
     });
+    this.alert('Todo updated successfully.');
+  }
+
+  alert(notification){
+    this.setState({
+      notification
+    });
+
+    setTimeout(() => {
+      this.setState({notification: null});
+    }, 2000);
   }
 
   deleteTodo(index){
     const todos = this.state.todos;
     delete todos[index];
-    this.setState({ todos })
+    this.setState({ todos });
+    this.alert('Todo deleted successfully.')
   }
 
   render() {
@@ -87,6 +115,12 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1>CRUD React</h1>
           <div className="container">
+            {
+              this.state.notification &&
+              <div className="alert alert-success">
+                <p className="text-center">{this.state.notification}</p>
+              </div>
+            }
             <input 
               type="text" 
               name="todo"
@@ -98,24 +132,21 @@ class App extends Component {
 
             <button 
               onClick={this.state.editing ? this.updateTodo : this.addTodo}
-              className="btn-info mb-3 form-control">
+              className="btn-success mb-3 form-control" 
+              disabled={this.state.newTodo.length < 5}
+            >
               {this.state.editing ? 'Update todo' : 'Add todo'}
             </button>
             {
               !this.state.editing && 
               <ul className="list-group">            
               {this.state.todos.map((item, index) => {
-                return <li key={item.id} className="list-group-item-success">
-                  <button 
-                    className="btn-sm mr-4 btn btn-info"
-                    onClick={() => {this.editTodo(index); } }
-                  >U</button>
-                  {item.name}
-                  <button 
-                    className="btn-sm ml-4 btn btn-danger"
-                    onClick={() => {this.deleteTodo(index); } }
-                  >X</button>
-                </li>
+                return <ListItem
+                  key = {item.id}
+                  item = {item}
+                  editTodo ={() => {this.editTodo(index)}}
+                  deleteTodo = {() => {this.deleteTodo(index)}}
+                />
               })}
             </ul>
             }

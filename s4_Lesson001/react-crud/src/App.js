@@ -22,7 +22,7 @@ class App extends Component {
     this.editTodo = this.editTodo.bind(this);
     this.updateTodo = this.updateTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
-    this.generateTodoId = this.generateTodoId.bind(this);
+    //this.generateTodoId = this.generateTodoId.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -40,22 +40,27 @@ class App extends Component {
     //console.log(event.target.name, event.target.value);
   }
 
-  generateTodoId(){
+  /*generateTodoId(){
     const lastTodo = this.state.todos[this.state.todos.length -1];
     if (lastTodo){
       return lastTodo.id + 1;
     }
     return 1;
-  }
+  }*/
 
-  addTodo(){
-    const newTodo = {
+  async addTodo(){
+    /*const newTodo = {
       name: this.state.newTodo,
       id: this.generateTodoId()
-    }
+    }*/
+
+    const response = await axios.post(`${this.apiUrl}/todos`,{
+      name: this.state.newTodo
+    });
 
     const todos = this.state.todos;
-    todos.push(newTodo);
+    //todos.push(newTodo);
+    todos.push(response.data);
 
     //state is IMMUTABLE
     this.setState({
@@ -76,11 +81,17 @@ class App extends Component {
     })
   }
 
-  updateTodo(){
+  async updateTodo(){
     const todo = this.state.todos[this.state.editingIndex];
-    todo.name = this.state.newTodo;
+    
+    const response = await axios.put(`${this.apiUrl}/todos/${todo.id}`,{
+      name: this.state.newTodo
+    })
+
+    //todo.name = this.state.newTodo;
     const todos = this.state.todos;
-    todos[this.state.editingIndex] = todo;
+    //todos[this.state.editingIndex] = todo;
+    todos[this.state.editingIndex] = response.data;
     this.setState({
       todos, 
       editing: false, 
@@ -100,8 +111,11 @@ class App extends Component {
     }, 2000);
   }
 
-  deleteTodo(index){
+  async deleteTodo(index){
     const todos = this.state.todos;
+    const todo = todos[index];
+
+    const response = await axios.delete(`${this.apiUrl}/todos/${todo.id}`);
     delete todos[index];
     this.setState({ todos });
     this.alert('Todo deleted successfully.')

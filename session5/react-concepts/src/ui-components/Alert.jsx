@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const Alert = ({ type, message, children }) =>{
     return (
@@ -6,6 +7,16 @@ const Alert = ({ type, message, children }) =>{
             {message ? message : children}
         </div>
     );
+}
+
+Alert.propTypes = {
+    type: PropTypes.string.isRequired,
+    message: PropTypes.string
+};
+
+
+Alert.defaultProps = {
+    message: null
 }
 
 export default Alert;

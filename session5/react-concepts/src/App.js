@@ -8,18 +8,29 @@ class App extends Component {
     this.state = {
       showAlert: true
     }
+
+    this.toogleAlert = this.toogleAlert.bind(this);
+  }
+
+  toogleAlert() {
+    this.setState({
+      showAlert: !this.state.showAlert
+    })
   }
 
   render() {
     return (
       <div className="container">
-        <Alert type="warning" show={this.state.showAlert}>
+        <Alert type="warning" toogleAlert={this.toogleAlert} show={this.state.showAlert}>
           <small>Small message</small>
         </Alert>
-        <Alert type="success">
+        <Alert type="success" toogleAlert={this.toogleAlert} show={this.state.showAlert}>
           <h2 className="alert-heading">This is an alert heading</h2>
         </Alert>
-        <Alert type="info" message="Database is almost full." />
+        <Alert type="info" 
+               toogleAlert={this.toogleAlert} 
+               show={this.state.showAlert} 
+               message="Database is almost full." />
       </div>
     );
   }

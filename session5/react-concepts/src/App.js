@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Alert from './ui-components/Alert';
+import Alert, { DismissableComponent, AnimatedAlert } from './ui-components/Alert';
 
 
 class App extends Component {
@@ -21,16 +21,17 @@ class App extends Component {
   render() {
     return (
       <div className="container">
-        <Alert type="warning" toogleAlert={this.toogleAlert} show={this.state.showAlert}>
-          <small>Small message</small>
-        </Alert>
         <Alert type="success" toogleAlert={this.toogleAlert} show={this.state.showAlert}>
-          <h2 className="alert-heading">This is an alert heading</h2>
+          <small>small message</small>
         </Alert>
         <Alert type="info" 
                toogleAlert={this.toogleAlert} 
                show={this.state.showAlert} 
                message="Database is almost full." />
+        <DismissableComponent type="info" toogleAlert={this.toogleAlert} show={this.state.showAlert}>
+          <h2 className="alert-heading">This is an alert heading</h2>
+        </DismissableComponent>
+        <AnimatedAlert type="warning" toogleAlert={this.toogleAlert} show={this.state.showAlert} message="Animated Alert" />
       </div>
     );
   }
